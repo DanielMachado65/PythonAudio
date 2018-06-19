@@ -1,0 +1,26 @@
+# History (1950)
+
+O reconhecimento de fala tem suas raízes em pesquisas feitas por Bell Labs no início dos anos 50. Que tinham limitação à um único falante e um dicionário limitado. Porém os sistemas atuais podem reconhecer a fala de vários falantes e ter enormes vocabulários em vários idiomas.
+
+> A maoria dos sistemas se baseiam no que é conhecido como __Hidden Markov Modelo (_HMM_)__.
+
+### Abordagem:
+  Baseada na suposição de que um sinal de fala, quando visualizado em uma escala de tempo suficientemente curta (milissegundos), podem ser razoavelmente aproximadas com um processo estacionário - *propriedades estatísticas* não mudam com o tempo.
+    * Abordagem Clássica:
+      * Fragmentos divididos em 10 milissegundos. Então o espectro de energia de cada fragmento, que é essencialmente um gráfico do poder (poder do sinal x frequência) pode ser mapeado para um vetor de números reais conhecidos como coeficientes __ceptrais__.
+      * A dimensão deste vetor é geralmente pequena.
+      * A saída do HMM é uma sequência de vetores
+      * Para decodificar a fala em texto, grupos de vetores são combinados com um ou mais __fonemas__. O que requer treinamento ou um dicionário, uma vez que o som de um fonema varia de falante para falante, ou até mesmo de pronuncia do mesmo falante.
+        * aplica-se uma algoritmo para determinar a palavra (ou palavras) mais provável que produza a sequência de fonemas dada.
+      * Esse processamento é caro _computacionalmente_ logo usa-se:
+        1. redes neurais para simplificar o sinal da fala.
+        2. técnicas de transformação de recursos
+        3. redução de dimensionalidade antes de do reconhecimento de HMM
+        4. Detectores de atividade de voz (_VADs_). Também são usados para reduzir um sinal de áudio somente para as partes que provavelmente contêm fala. Isso evita que o reconhecedor perca tempo analisando partes desnecessárias do sinal.
+
+
+## Componentes:
+  1. Fala
+  2. Conversação do som físico para um sinal elétrico com um microfone.
+  3. Dados digitais com um conversor analógico para digital.
+    1. Vários modelos podem ser usado para converter nessa etapa.
