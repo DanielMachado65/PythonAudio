@@ -58,6 +58,37 @@ pip install --upgrade tensorflow
 
   ```
 
+* ### Bibliotecas que podem ser usadas:
+
+  * ##### Bibliotecas que contém recurso interno:
+
+    >  Bibliotecas que contém recursos internos, como o processamento de linguagem natural (intenção do interlocutor)
+
+    * `API.AI` - integração com do reconhecimento de fala com a API de processamento de linguagem natural. [saber mais](https://github.com/dialogflow/dialogflow-python-client)
+      - Permite:
+        + usar comandos de voz
+        + deteção de atividade de voz
+        + integração com cenários de diálogos definidos para um determinado agente - _processamento de linguagem natural_
+
+    * `wit` - Com modelo interativo também. __É GRATUITO__
+      * (https://wit.ai/)
+
+  * ##### Bibliotecas UniFuncional:
+
+    > Bibliotecas que normalmente só contém uma única função
+
+    * `google-cloud-speech` - Biblioteca que concentra apenas na transcrição de áudio para texto
+    * `SpeechRecognition` - Biblioteca que está sendo usada no resumo
+
+  * ##### Outras Bibliotecas:
+
+    > Bibliotecas que normalmente só contém uma única função
+
+    * `assemblyai` - Diferencial que pode conter modelos de reconhecimento de voz. Porém até por enquanto é só arquivo de voz, não é gravado em tempo real.
+      * (https://docs.assemblyai.com/clients/#pythonclient)
+    * `pocketphink`
+    * `watson-developer-cloud`
+
 
 * ### !links importantes:
   * link para [visualização rápida](https://www.youtube.com/watch?v=qpYpwf06SO8)

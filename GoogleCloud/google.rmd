@@ -1,0 +1,23 @@
+# Google Cloud:
+
+> Conversão de voz em texto com tecnologia de aprendizado de máquina.
+
+### Caracteristica:
+
+* Reconhecimento de fala avançado, com modelos de redes neurais avançados.
+* Resultado de texto em tempo real
+* precisão em ambientes barulhentos
+
+A Speech API oferece suporte a qualquer dispositivo que possa enviar uma solicitação REST ou gRPC, incluindo telefones, computadores, tablets e dispositivos com Internet das Coisas (IoT, na sigla em inglês) como, por exemplo, carros, TVs e alto-falantes.
+
+### PREÇO DA CLOUD SPEECH API
+
+0 - 60 minutos 	Gratuito
+61 - 1.000.000 minutos** 	US$ 0,006
+
+
+### Link:
+
+* (https://pypi.org/project/google-cloud-speech/)
+
+* [Documentação Oficial](https://google-cloud-python.readthedocs.io/en/latest/speech/index.html)
