@@ -1,0 +1,284 @@
+# Speech Recognition:
+> 
+> * [Dicionário](https://github.com/Uberi/speech_recognition/blob/master/reference/library-reference.rst#recognizer_instanceenergy_threshold--300---type-float)
+    * [Dicionário mais simples](https://pypi.org/project/SpeechRecognition/3.1.3/)
+
+### @class Recognizer:
+
+- reconhecer a fala
+  + cada instância uma variedade de configurações e funcionalidades
+
+```py
+import speech_recognition as sr
+r = sr.Recognizer()
+```
+
+##### recognizer_instance.energy_threshold
+
+representa a quantidade de energia que envolve o som. 
+
+````py
+r.energy_threshold = 4000
+````
+
+| Método | Descrição |
+| :------------- | :------------- |
+| `recognizer_bing()` | **Microsoft** Bing Speech |
+| `recognizer_google()` | API de fala do **Google** |
+| `recognizer_google_cloud()` | **Google Cloud** Speech (porém requer instalação do pacote __google-cloud-speech__) |
+| `recognizer_houndify()` | Houndify pelo SoundHound |
+| `recognizer_ibm()` | API da __IBM__|
+| `recognizer_sphinx()` | Sphinx CMU - _requer instalação do_ __PocketSphinx__, porém apenas esse funciona offline|
+| `recognizer_wit()`| __WIT.ai__|
+
+* basicamente todas as bibliotecas precisam de uma senha e login
+    - menos _Google Web Speech API_
+        + porém também pode haver revogação do _Google_ a qualquer momento, por se uma chave padrão.
+        + limitada a 50 requisições por dia.
+
+### Version:
+
+```py
+import speech_recognition as sr
+
+print(sr.__version__)
+```
+
+
+### Exceções:
+
+Para tratamento de erro pode haver:
+    * <strong><em>Request Error</em></strong> - API se encontra inacessível
+        - para o `recognize_sphinx` pode acontecer como resultado de não ter uma instalação/corrompida/incompátivel. 
+        - para outras **bibliotecas** pode ser:
+            + limite de cota atengido
+            + servidor não está disponivel
+            + não há conexão com a internet
+    * <strong><em>UnknownValueError</em></strong> - para discurso que não consegue se compreender, normalmente associado com a classe de Microphone.
+
+
+### @code:
+
+```py
+# required a audio-file -- @return string
+r.recognize_google()
+
+# @return dicionário com as chave ['alternative']. Que é uma lista. 
+r.recognize_google(audio, show_all=True)
+```
+
+## Meaning:
+
+### @class AudioData and AudioFile:
+
+podemos criar uma descrição de uma data audio de duas formas:
+    * partir de um arquivo de áudio 
+    * gravado por um microfone
+
+Graças ao AudioFile que é para arquivos gravados, ela pode ser inicalizada apenas com o caminho para um arquivo de áudio e fornece uma interface de gerenciador de contexto para __ler e trabalhar__ com o conteúdo.
+
+### Arquivos de Áudio:
+
+##### @class AudioFile
+
+````py
+# @return AudioFile
+AudioFile(filename_or_fileObject: Union[str, io.IOBase])
+````
+
+instancia de arquivo de audio. Que aceita:
+
+|Tipos suportados|
+| -------------- |
+| __WAV__ |
+| __AIFF__ | 
+| __AIFF-C__ | 
+| __FLAC__ | 
+
+Se você estiver trabalhando em Linux, MacOS ou Windows baseado em x-86, poderá trabalhar com arquivos FLAC sem problemas. Em outras plataformas, você precisará instalar um codificador FLAC e garantir que você tenha acesso à ferramenta de linha de comando flac . Você pode encontrar mais informações aqui se isso se aplicar a você.
+
+* #### Para captura:
+    ````py
+    # harvard is instance AudioFile called by source 
+    """
+    Ele também é um contexto
+    """
+    harvard = sr.AudioFile('harvard.wav')   
+    with harvard as source:
+        audio = sr.record(source)  #  registra os dados do arquivo inteiro em uma instância de AudioData
+
+    r.recognize_google(audio)
+    type(audio)
+    # <class 'speech_recognition.AudioData'>
+    ````
+* #### Offset e duração:
+    - ###### Duration:
+        se você quiser capturar apenas uma parte do discurso do arquivo:
+        ````py
+        harvard = sr.AudioFile('harvard.wav')   
+        with harvard as source:
+            audio = sr.record(source, duration=12)  #  duration == segunds 
+
+        r.recognize_google(audio)
+        ````
+        - <strong><em>dica:</em></strong> como o método (<em>with</em>) avança com o fluxo do arquivo.
+    - ###### offset:
+        Para usar em um ponto de partida. O número de segundos que deve ser ignorado antes de começar.
+        ````py
+        harvard = sr.AudioFile('harvard.wav')   
+        with harvard as source:
+            audio = sr.record(source,offset=4, duration=12)  #  offset == segunds 
+
+        r.recognize_google(audio)
+        ````
+
+#### Constante audiofile_instance.DURATION
+
+tamanho do audio guardado em segundos. A propriedade é apenas disponivel dentro do contexto.
+
+````py
+# float
+audiofile_instance.DURATION 
+````
+
+#### Barulho:
+
+para efeito de tratamento de barulho usamos `adjust_for_ambient_noise()`, que basicamente lê o primeiro segundo do fluxo de arquivos e calibra o reconhecedor.
+    * podemos ajustar com o tempo de análise.
+    * porém as vezes não é o suficiente para conseguir fazer o tratamento com audio muito barulhento. `SciPy` pode fazer esse tratamento, ou um software de edição de áudio.
+
+## @class Microfone:
+
+Pacote required: `PyAudio`. 
+````
+sudo apt-get install python-pyaudio python3-audio
+pip install pyaudio
+````
+
+a classe em si:
+````py
+r = sr.Recognizer()
+mic = sr.Microphone()
+
+# você pode obter a lista dos microphones possiveis:
+sr.Microphone.list_microphones_names()
+"""
+['HDA Intel PCH: ALC272 Analog (hw:0,0)',
+ 'HDA Intel PCH: HDMI 0 (hw:0,3)',
+ 'sysdefault',
+ 'front',
+ 'surround40',
+ 'surround51',
+ 'surround71',
+ 'hdmi',
+ 'pulse',
+ 'dmix', 
+ 'default']
+"""
+
+# os microfones que estão trabalhando
+sr.Microphone.list_working_microphones()
+
+# podemos escolher qual vai ser o device.
+mic = sr.Microphone(device_index=3) 
+
+# mas os parametros permitidos:
+# @Return Microphone
+sr.Microphone(device_index: Union[int, None] = None; sample_rate: int = 16000, chunck_size: int = 1024
+````
+
+### Listen()
+
+para capturar a entrada do microfone. Ele é um gerenciador de contexto - ou seja, você pode utilizar dentro de um bloco <strong><em>with</em></strong>
+
+````py
+with mic as source:
+    r.adjust_for_ambient_noise(source)
+    audio = r.listen(source)
+# finalize: quando o silêncio for detectado. 
+````
+
+### Listen_in_background():
+
+Gera uma Thread para grvar repetidamente frases de origem. 
+    * grava em uma instância: `AudioData (que seria um AudioSource)`
+para capturar a no background o audio
+    * o encadeamento é um __DAEMON__ que impede que o programa finalize.
+    * <strong>O reconhecimento de frase usa exatemente o mesmo mecanismo que o listen(<em>source</em>)</strong>
+    * callback: 
+        - <strong>Conceitual: </strong> retorna um objeto de função que, quando chamado, solicita a interrpução do ouvinte encadeamento do ouvinte e aguarda até retornar antes de retornar. 
+        - a função deve aceitar <strong>2</strong> parametros. 
+            + recognizer_instance
+            + AudioData 
+
+```py
+recognizer_instance.listen_in_background(source: AudioSource, callback: Callable[[Recognizer, AudioData], Any]) -> Callable[bool, None]
+
+# or (more _simple_)
+recognizer_instance.listen_in_background(source, callback)
+```
+
+### Recognize's: 
+
+```py
+recognizer_instance.recognize_sphinx(audio_data: AudioData, language: str = "en-US", keyword_entries: Union[Iterable[Tuple[str, float]], None] = None, grammar: Union[str, None] = None, show_all: bool = False) -> Union[str, pocketsphinx.pocketsphinx.Decoder]
+
+recognizer_instance.recognize_google(audio_data: AudioData, key: Union[str, None] = None, language: str = "en-US", show_all: bool = False) -> Union[str, Dict[str, Any]]
+# or
+recognizer_instance.recognize_google(audio_data, key = None, language = "en-US", show_all = False)
+
+
+recognizer_instance.recognize_google_cloud(audio_data: AudioData, credentials_json: Union[str, None] = None, language: str = "en-US", preferred_phrases: Union[Iterable[str], None] = None, show_all: bool = False) -> Union[str, Dict[str, Any]]
+
+recognizer_instance.recognize_wit(audio_data: AudioData, key: str, show_all: bool = False) -> Union[str, Dict[str, Any]]
+# or 
+recognizer_instance.recognize_wit(audio_data, key, show_all = False)
+
+
+recognizer_instance.recognize_bing(audio_data: AudioData, key: str, language: str = "en-US", show_all: bool = False) -> Union[str, Dict[str, Any]]
+
+recognizer_instance.recognize_houndify(audio_data: AudioData, client_id: str, client_key: str, show_all: bool = False) -> Union[str, Dict[str, Any]]
+
+recognizer_instance.recognize_ibm(audio_data: AudioData, username: str, password: str, language: str = "en-US", show_all: bool = False) -> Union[str, Dict[str, Any]]
+# or 
+recognizer_instance.recognize_ibm(audio_data, username, password, language="en-US", show_all = False)
+
+
+#To get the app key and app secret for an AT&T
+recognizer_instance.recognize_att(audio_data, app_key, app_secret, language="en-US", show_all = False)
+```
+
+### AudioSource
+
+> Base class representing audio sources.
+
+* **Do not instantiate.** 
+
+Instances of subclasses of this class:
+    * Microphone 
+    * WavFile
+
+Can be passed to things like `recognizer_instance.record` and `recognizer_instance.listen`.
+
+````py
+AudioData(frame_data: bytes, sample_rate: int, sample_width: int) -> AudioData
+````
+
+###### métodos:
+
+* `audiodata_instance.get_segment(start_ms: Union[float, None] = None, end_ms: Union[float, None] = None) -> AudioData`
+
+### AudioData
+
+> Storage class for audio data. 
+
+* **Do not instantiate.** 
+
+Instances of this class are returned from `recognizer_instance.record` and `recognizer_instance.listen`, and are passed to callbacks of `recognizer_instance.listen_in_background`
+
+###### métodos:
+
+* `audiodata_instance.get_flac_data()`
+
+* `audiodata_instance.get_wav_data()`
+
